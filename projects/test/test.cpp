@@ -113,12 +113,12 @@ int main(int argc, char** argv) {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexUVs), vertexUVs, GL_STATIC_DRAW);
 	
 	mncl::ShaderModule* vShader; 
-	if (!mncl::ShaderModule::Create(&vShader, GL_VERTEX_SHADER, new std::ifstream("vsh.shader"))) {
+	if (!mncl::ShaderModule::Create(&vShader, GL_VERTEX_SHADER, new std::ifstream("vertex.gl"))) {
 		return 1;
 	}
 
 	mncl::ShaderModule* fShader; 
-	if (!mncl::ShaderModule::Create(&fShader, GL_FRAGMENT_SHADER, new std::ifstream("fsh.shader"))) {
+	if (!mncl::ShaderModule::Create(&fShader, GL_FRAGMENT_SHADER, new std::ifstream("fragment.gl"))) {
 		return 1;
 	}
 

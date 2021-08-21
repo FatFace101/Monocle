@@ -39,6 +39,7 @@ namespace mncl
 	template<typename T, typename S> class ShaderUniformVector : public ShaderUniformBase {
 		template<typename T> friend class ShaderUniform;
 		friend class ShaderUniformBase;
+		friend class ShaderProgram;
 		static void (APIENTRYP GLFunc)(GLint location, GLsizei count, const S* value);
 		static const GLenum AcceptTypes[];
 		ShaderUniformVector() = default;
@@ -51,6 +52,7 @@ namespace mncl
 	template<typename T, typename S> class ShaderUniformMatrix : public ShaderUniformBase {
 		template<typename T> friend class ShaderUniform;
 		friend class ShaderUniformBase;
+		friend class ShaderProgram;
 		static void (APIENTRYP GLFunc)(GLint location, GLsizei count, GLboolean transpose, const S* value);
 		static const GLenum AcceptTypes[];
 		ShaderUniformMatrix() = default;
@@ -63,6 +65,7 @@ namespace mncl
 
 	template<typename T> class ShaderUniform final : public ShaderUniformBase {
 		friend class ShaderUniformBase;
+		friend class ShaderProgram;
 		static void (APIENTRYP GLFunc)(GLint location, T value);
 		static const GLenum AcceptTypes[];
 	public:
@@ -123,18 +126,53 @@ namespace mncl
 			GLenum uniformType;
 			glGetActiveUniform(programID, ul, 0, nullptr, &uniformSize, &uniformType, nullptr);
 
-			for (int )
+			
 
-			uniform->uniformLocation = ul;
-
+			for (int i = 0; i < sizeof(ShaderUniform<T>::AcceptTypes) / sizeof(GLenum); i++) {
+				if (ShaderUniform<T>::AcceptTypes[i] == uniformType) {
+					uniform->uniformLocation = ul;
+					return false;
+				};
+			}
 			return true;
 		};
 		void use();
 		static bool Create(ShaderProgram** out, uint32_t moduleCount, ShaderModule** modules);
 	};
 
-	
+	#define MNCL_SCALAR_ACCEPT_TYPES(T) const GLenum ShaderUniform<T>::AcceptTypes[]
+	#define MNCL_VECTOR_ACCEPT_TYPES(T, S) const GLenum ShaderUniformVector<T<S, glm::highp>, S>::AcceptTypes[]
+	#define MNCL_MATRIX_ACCEPT_TYPES(T, S) const GLenum ShaderUniformMatrix<T<S, glm::highp>, S>::AcceptTypes[]
 
+	MNCL_SCALAR_ACCEPT_TYPES(float) = { GL_FLOAT, GL_DOUBLE };
+	MNCL_SCALAR_ACCEPT_TYPES(int) = { GL_INT };
+	MNCL_SCALAR_ACCEPT_TYPES(unsigned int) = { GL_UNSIGNED_INT };
+
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec1, float) = { GL_FLOAT     , GL_DOUBLE };
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec2, float) = { GL_FLOAT_VEC2, GL_DOUBLE_VEC2 };
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec3, float) = { GL_FLOAT_VEC3, GL_DOUBLE_VEC3 };
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec4, float) = { GL_FLOAT_VEC4, GL_DOUBLE_VEC4 };
+
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec1, int) = { GL_INT };
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec2, int) = { GL_INT_VEC2 };
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec3, int) = { GL_INT_VEC3 };
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec4, int) = { GL_INT_VEC4 };
+
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec1, unsigned int) = { GL_UNSIGNED_INT };
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec2, unsigned int) = { GL_UNSIGNED_INT_VEC2 };
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec3, unsigned int) = { GL_UNSIGNED_INT_VEC3 };
+	MNCL_VECTOR_ACCEPT_TYPES(glm::tvec4, unsigned int) = { GL_UNSIGNED_INT_VEC4 };
+
+	MNCL_MATRIX_ACCEPT_TYPES(glm::tmat2x2, float) = { GL_FLOAT_MAT2  , GL_DOUBLE_MAT2 };
+	MNCL_MATRIX_ACCEPT_TYPES(glm::tmat2x3, float) = { GL_FLOAT_MAT2x3, GL_DOUBLE_MAT2x3 };
+	MNCL_MATRIX_ACCEPT_TYPES(glm::tmat2x4, float) = { GL_FLOAT_MAT2x4, GL_DOUBLE_MAT2x4 };
+	MNCL_MATRIX_ACCEPT_TYPES(glm::tmat3x2, float) = { GL_FLOAT_MAT3x2, GL_DOUBLE_MAT3x2 };
+	MNCL_MATRIX_ACCEPT_TYPES(glm::tmat3x3, float) = { GL_FLOAT_MAT3  , GL_DOUBLE_MAT3 };
+	MNCL_MATRIX_ACCEPT_TYPES(glm::tmat3x4, float) = { GL_FLOAT_MAT3x4, GL_DOUBLE_MAT3x4 };
+	MNCL_MATRIX_ACCEPT_TYPES(glm::tmat4x2, float) = { GL_FLOAT_MAT4x2, GL_DOUBLE_MAT4x2 };
+	MNCL_MATRIX_ACCEPT_TYPES(glm::tmat4x3, float) = { GL_FLOAT_MAT4x3, GL_DOUBLE_MAT4x3 };
+	MNCL_MATRIX_ACCEPT_TYPES(glm::tmat4x4, float) = { GL_FLOAT_MAT4  , GL_DOUBLE_MAT4 };
+	
 	#define MNCL_SCALAR_FUNCTION(T) void (APIENTRYP ShaderUniform<T>::GLFunc)(GLint, T) 
 	#define MNCL_VECTOR_FUNCTION(T, S) void (APIENTRYP ShaderUniformVector<T<S, glm::highp>, S>::GLFunc)(GLint, GLsizei, const S*)
 	#define MNCL_MATRIX_FUNCTION(T, S) void (APIENTRYP ShaderUniformMatrix<T<S, glm::highp>, S>::GLFunc)(GLint, GLsizei, GLboolean, const S*)

@@ -12,38 +12,7 @@ using namespace mncl;
 
 
 
-#define MNCL_SCALAR_ACCEPT_TYPES(T) const GLenum ShaderUniform<T>::AcceptTypes[]
-#define MNCL_VECTOR_ACCEPT_TYPES(T, S) const GLenum ShaderUniformVector<T<S, glm::highp>, S>::AcceptTypes[]
-#define MNCL_MATRIX_ACCEPT_TYPES(T, S) const GLenum ShaderUniformMatrix<T<S, glm::highp>, S>::AcceptTypes[]
 
-MNCL_SCALAR_ACCEPT_TYPES(float) = { GL_FLOAT, GL_DOUBLE };
-MNCL_SCALAR_ACCEPT_TYPES(int) = { GL_INT };
-MNCL_SCALAR_ACCEPT_TYPES(unsigned int) = { GL_UNSIGNED_INT };
-
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec1, float) = { GL_FLOAT     , GL_DOUBLE };
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec2, float) = { GL_FLOAT_VEC2, GL_DOUBLE_VEC2 };
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec3, float) = { GL_FLOAT_VEC3, GL_DOUBLE_VEC3 };
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec4, float) = { GL_FLOAT_VEC4, GL_DOUBLE_VEC4 };
-
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec1, int) = { GL_INT };
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec2, int) = { GL_INT_VEC2 };
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec3, int) = { GL_INT_VEC3 };
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec4, int) = { GL_INT_VEC4 };
-
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec1, unsigned int) = { GL_UNSIGNED_INT };
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec2, unsigned int) = { GL_UNSIGNED_INT_VEC2 };
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec3, unsigned int) = { GL_UNSIGNED_INT_VEC3 };
-MNCL_VECTOR_ACCEPT_TYPES(glm::tvec4, unsigned int) = { GL_UNSIGNED_INT_VEC4 };
-
-MNCL_MATRIX_ACCEPT_TYPES(glm::tmat2x2, float) = { GL_FLOAT_MAT2  , GL_DOUBLE_MAT2 };
-MNCL_MATRIX_ACCEPT_TYPES(glm::tmat2x3, float) = { GL_FLOAT_MAT2x3, GL_DOUBLE_MAT2x3 };
-MNCL_MATRIX_ACCEPT_TYPES(glm::tmat2x4, float) = { GL_FLOAT_MAT2x4, GL_DOUBLE_MAT2x4 };
-MNCL_MATRIX_ACCEPT_TYPES(glm::tmat3x2, float) = { GL_FLOAT_MAT3x2, GL_DOUBLE_MAT3x2 };
-MNCL_MATRIX_ACCEPT_TYPES(glm::tmat3x3, float) = { GL_FLOAT_MAT3  , GL_DOUBLE_MAT3 };
-MNCL_MATRIX_ACCEPT_TYPES(glm::tmat3x4, float) = { GL_FLOAT_MAT3x4, GL_DOUBLE_MAT3x4 };
-MNCL_MATRIX_ACCEPT_TYPES(glm::tmat4x2, float) = { GL_FLOAT_MAT4x2, GL_DOUBLE_MAT4x2 };
-MNCL_MATRIX_ACCEPT_TYPES(glm::tmat4x3, float) = { GL_FLOAT_MAT4x3, GL_DOUBLE_MAT4x3 };
-MNCL_MATRIX_ACCEPT_TYPES(glm::tmat4x4, float) = { GL_FLOAT_MAT4  , GL_DOUBLE_MAT4 };
 
 
 #define MNCL_SCALAR_FUNCTION_D(T) ShaderUniform<T>::GLFunc
