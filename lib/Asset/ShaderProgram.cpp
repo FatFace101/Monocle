@@ -68,7 +68,7 @@ ShaderModule::~ShaderModule()
 }
 
 
-bool ShaderModule::Create(ShaderModule **out, GLenum shaderType, std::istream *inputStream)
+bool ShaderModule::Create(ShaderModule**  out, GLenum shaderType, std::istream* inputStream)
 {
 	//Get source for shader
 	std::string fileString = std::string(std::istreambuf_iterator<char>(*inputStream), std::istreambuf_iterator<char>());
@@ -82,15 +82,14 @@ bool ShaderModule::Create(ShaderModule **out, GLenum shaderType, std::istream *i
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &compSuccess);
 	if (!compSuccess)
 	{
-		glDeleteShader(shaderID);
-
 		//Log error
 		GLint logSize = 0;
 		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logSize);
-		std::vector<char> errMsg((uint64_t)logSize + 1);
-		glGetShaderInfoLog(shaderID, logSize, nullptr, errMsg.data());
-		printf("Shader error:\n%s\n", errMsg.data());
-		
+		char* errMsg = new char[(uint64_t)logSize + 1];
+		glGetShaderInfoLog(shaderID, logSize, nullptr, errMsg);
+		printf("Shader error:\n%s\n", errMsg);
+		glDeleteShader(shaderID);
+
 		return false;
 	}
 	*out = new ShaderModule(shaderID);
@@ -105,7 +104,7 @@ ShaderProgram::~ShaderProgram() {
 	glDeleteProgram(programID);
 }
 
-bool ShaderProgram::Create(ShaderProgram **out, uint32_t moduleCount, ShaderModule **modules)
+bool ShaderProgram::Create(ShaderProgram** out, uint32_t moduleCount, ShaderModule** modules)
 {
 
 	GLint programID = glCreateProgram();
@@ -122,14 +121,13 @@ bool ShaderProgram::Create(ShaderProgram **out, uint32_t moduleCount, ShaderModu
 	glGetProgramiv(programID, GL_LINK_STATUS, &linkSuccess);
 	if (!linkSuccess) 
 	{
-		glDeleteProgram(programID);
-
 		//Log error
 		GLint logSize = 0;
 		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &logSize);
-		std::vector<char> errMsg((uint64_t)logSize + 1);
-		glGetProgramInfoLog(programID, logSize, nullptr, errMsg.data());
-		printf("Program link error:\n%s\n", errMsg.data());
+		char* errMsg = new char[(uint64_t)logSize + 1];
+		glGetProgramInfoLog(programID, logSize, nullptr, errMsg);
+		printf("Program link error:\n%s\n", errMsg);
+		glDeleteProgram(programID);
 		return 1;
 	}
 	for (uint32_t moduleIndex = 0; moduleIndex < moduleCount; moduleIndex++)

@@ -12,7 +12,7 @@ namespace mncl {
 		unsigned int height;
 		GLuint texId;
 		
-		void generate(unsigned char* data);
+		void generate(unsigned char* data, int channels);
 	public:
 		GLuint getTexture() {return texId;};
 

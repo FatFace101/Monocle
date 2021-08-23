@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
 
 	glfwSetErrorCallback(ErrCallback);
 	
-	GLFWwindow *window = glfwCreateWindow(800,450,"No u", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(800,450,"Monocle", nullptr, nullptr);
 	if (!window) {
 		return 1;
 	}
@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
 	glm::vec3 col(0.0f,0.0f,1.0f);
 
 	
-	mncl::Texture* tex = new mncl::Texture("boi.jpg");
+	mncl::Texture* tex = new mncl::Texture("boi.png");
 
 	
 
@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
 	mncl::ShaderUniform<int> textureLoc;
 	shaderProgram->getUniform(&textureLoc, "TexSampler");
 
-
+	
 	glClearColor(1.0f,1.0f,0.5f,0.0f);
 	
 	glm::quat camrot;
