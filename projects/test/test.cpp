@@ -9,8 +9,8 @@
 #include "glm/glm/gtc/type_ptr.hpp"
 
 #include "monocle/Asset/ShaderProgram.h"
-#include "monocle/Scene/SceneObject.h"
-#include "monocle/Scene/Camera.h"
+#include "monocle/Render/SceneObject.h"
+#include "monocle/Render/Camera.h"
 #include "monocle/Asset/Texture.h"
 #include "monocle/Asset/ShaderUniformValue.h"
 

@@ -1,7 +1,7 @@
 #ifndef MONOCLE_CAMERA_H
 #define MONOCLE_CAMERA_H
 
-#include "monocle/Scene/SceneObject.h"
+#include "monocle/Render/SceneObject.h"
 
 namespace mncl {
 	class Camera : public SceneObject {

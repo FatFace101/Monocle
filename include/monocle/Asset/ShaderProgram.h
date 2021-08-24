@@ -6,7 +6,7 @@
 
 #include "glad/glad.h"
 
-#include "monocle/Scene/SceneObject.h"
+#include "monocle/Render/SceneObject.h"
 
 
 

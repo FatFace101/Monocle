@@ -1,4 +1,4 @@
-#include "monocle/Scene/SceneObject.h"
+#include "monocle/Render/SceneObject.h"
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtc/quaternion.hpp"
 #include "glm/glm/gtx/transform.hpp"

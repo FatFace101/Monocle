@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "monocle/Scene/SceneObject.h"
+#include "monocle/Render/SceneObject.h"
 #include "monocle/Asset/ShaderProgram.h"
 
 namespace mncl {
