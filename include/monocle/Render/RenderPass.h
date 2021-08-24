@@ -11,8 +11,6 @@ namespace mncl {
 template<class TriggerType> 
 class RenderPass {
 
-	std::vector<TriggerType*> triggers;
-
 	void render();
 
 public:
