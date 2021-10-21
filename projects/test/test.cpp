@@ -93,7 +93,6 @@ int main(int argc, char** argv) {
 
 	glfwMakeContextCurrent(window);
 	gladLoadGL();
-
 	mncl::ShaderUniformBase::SetupGLFunctions();
 
 	glfwSwapInterval(1);
