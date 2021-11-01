@@ -98,36 +98,30 @@ namespace mncl
 	{
 	private:
 		friend class ShaderProgram;
-
-		GLuint shaderID;
-		
-		ShaderModule(GLuint shaderID);
-		~ShaderModule();
+		GLuint shaderId;
 		GLuint *getUniformLocation();
 	public:
-		static bool Create(ShaderModule** out, GLenum shaderType, std::istream* inputStream);
+		~ShaderModule();
+		ShaderModule(GLenum shaderType, std::istream* inputStream);
 	};
 
 
 	class ShaderProgram
 	{
 	private:
-		ShaderProgram(GLuint programID);
-		~ShaderProgram();
 	public:
-		GLint programID;
+		~ShaderProgram();
+		GLint programId;
+
 		template <typename T> bool getUniform(ShaderUniform<T>* uniform, const char* uniformName) {
 			use();
-			GLint ul = glGetUniformLocation(programID, uniformName);
+			GLint ul = glGetUniformLocation(programId, uniformName);
 			if (ul < 0) {
 				return false;
 			}
 			int uniformSize;
 			GLenum uniformType;
-			glGetActiveUniform(programID, ul, 0, nullptr, &uniformSize, &uniformType, nullptr);
-
-			
-
+			glGetActiveUniform(programId, ul, 0, nullptr, &uniformSize, &uniformType, nullptr);
 			for (int i = 0; i < sizeof(ShaderUniform<T>::AcceptTypes) / sizeof(GLenum); i++) {
 				if (ShaderUniform<T>::AcceptTypes[i] == uniformType) {
 					uniform->uniformLocation = ul;
@@ -136,8 +130,9 @@ namespace mncl
 			}
 			return true;
 		};
-		void use();
-		static bool Create(ShaderProgram** out, uint32_t moduleCount, ShaderModule** modules);
+
+		void use() const;
+		ShaderProgram(uint32_t moduleCount, ShaderModule** modules);
 	};
 
 	#define MNCL_SCALAR_ACCEPT_TYPES(T) const GLenum ShaderUniform<T>::AcceptTypes[]

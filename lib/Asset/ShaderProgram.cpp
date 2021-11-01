@@ -59,90 +59,72 @@ ShaderUniformBase::operator bool() const { return uniformLocation >= 0; }
 bool ShaderUniformBase::isValid() const { return uniformLocation >= 0; }
 
 
-ShaderModule::ShaderModule(GLuint shaderID) : shaderID(shaderID) {}
+ShaderModule::ShaderModule(GLenum shaderType, std::istream* inputStream) {
+	std::string fileString = std::string(std::istreambuf_iterator<char>(*inputStream), std::istreambuf_iterator<char>());
+	const char* src = fileString.c_str();
+	shaderId = glCreateShader(shaderType);
+	glShaderSource(shaderId, 1, &src, nullptr);
+	glCompileShader(shaderId);
+
+	GLint compSuccess = GL_FALSE;
+	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compSuccess);
+	if (!compSuccess)
+	{
+		//Log error
+		/*GLint logSize = 0;
+		glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logSize);
+		char* errMsg = new char[(uint64_t)logSize + 1];
+		glGetShaderInfoLog(shaderId, logSize, nullptr, errMsg);
+		printf("Shader error:\n%s\n", errMsg);*/
+		glDeleteShader(shaderId);
+		throw new std::runtime_error("Shader compilation error");
+	}
+}
 
 
 ShaderModule::~ShaderModule() 
 {
-	glDeleteShader(shaderID);
+	glDeleteShader(shaderId);
 }
 
-
-bool ShaderModule::Create(ShaderModule**  out, GLenum shaderType, std::istream* inputStream)
-{
-	//Get source for shader
-	std::string fileString = std::string(std::istreambuf_iterator<char>(*inputStream), std::istreambuf_iterator<char>());
-	const char* src = fileString.c_str();
-	GLuint shaderID = glCreateShader(shaderType);
-	glShaderSource(shaderID, 1, &src, nullptr);
-	glCompileShader(shaderID);
-
-	//Check for compile error
-	GLint compSuccess = GL_FALSE;
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &compSuccess);
-	if (!compSuccess)
-	{
-		//Log error
-		GLint logSize = 0;
-		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logSize);
-		char* errMsg = new char[(uint64_t)logSize + 1];
-		glGetShaderInfoLog(shaderID, logSize, nullptr, errMsg);
-		printf("Shader error:\n%s\n", errMsg);
-		glDeleteShader(shaderID);
-
-		return false;
-	}
-	*out = new ShaderModule(shaderID);
-	return true;
-};
-
-
-ShaderProgram::ShaderProgram(GLuint programID) : programID(programID) {};
-
-
-ShaderProgram::~ShaderProgram() {
-	glDeleteProgram(programID);
-}
-
-bool ShaderProgram::Create(ShaderProgram** out, uint32_t moduleCount, ShaderModule** modules)
-{
-
-	GLint programID = glCreateProgram();
+ShaderProgram::ShaderProgram(uint32_t moduleCount, ShaderModule** modules) {
+	programId = glCreateProgram();
 
 	for (uint32_t moduleIndex = 0; moduleIndex < moduleCount; moduleIndex++)
 	{
-		glAttachShader(programID, modules[moduleIndex]->shaderID);
+		glAttachShader(programId, modules[moduleIndex]->shaderId);
 	}
 
-	glLinkProgram(programID);
+	glLinkProgram(programId);
 
 	//Check for link error
 	GLint linkSuccess = GL_FALSE;
-	glGetProgramiv(programID, GL_LINK_STATUS, &linkSuccess);
-	if (!linkSuccess) 
+	glGetProgramiv(programId, GL_LINK_STATUS, &linkSuccess);
+	if (!linkSuccess)
 	{
 		//Log error
-		GLint logSize = 0;
+		/*GLint logSize = 0;
 		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &logSize);
 		char* errMsg = new char[(uint64_t)logSize + 1];
 		glGetProgramInfoLog(programID, logSize, nullptr, errMsg);
-		printf("Program link error:\n%s\n", errMsg);
-		glDeleteProgram(programID);
-		return 1;
+		printf("Program link error:\n%s\n", errMsg);*/
+		glDeleteProgram(programId);
+		throw new std::runtime_error("Shader link error");
 	}
 	for (uint32_t moduleIndex = 0; moduleIndex < moduleCount; moduleIndex++)
 	{
-		glDetachShader(programID, modules[moduleIndex]->shaderID);
+		glDetachShader(programId, modules[moduleIndex]->shaderId);
 	}
-	*out = new ShaderProgram(programID); 
-	return true;
 };
 
 
+ShaderProgram::~ShaderProgram() {
+	glDeleteProgram(programId);
+}
 
 
-void ShaderProgram::use() {
-	glUseProgram(programID);
+void ShaderProgram::use() const {
+	glUseProgram(programId);
 }
 
 

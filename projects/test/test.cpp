@@ -13,6 +13,7 @@
 #include "monocle/Render/Camera.h"
 #include "monocle/Asset/Texture.h"
 #include "monocle/Asset/ShaderUniformValue.h"
+#include "monocle/Asset/JsonParser.h"
 
 
 
@@ -43,6 +44,43 @@ int main(int argc, char** argv) {
 	if (!glfwInit()) {
 		return 1;
 	}
+	{
+		using namespace mncl::json;
+		JsonParser jp = JsonParser(new std::ifstream("sample.json"));
+
+		while (true) {
+			int tok = 0;
+			try {
+				tok = jp.nextToken();
+			}
+			catch (const AssetParseException* re) {
+				printf("Error: %s\n", re->what());
+				break;
+			}
+			if (tok == (int)JsonParser::TokenType::eof) {
+				printf("EOF\n");
+				break;
+			}
+			switch (tok) {
+						
+				case (int)JsonParser::TokenType::string:
+					printf("string: %s\n", jp.stringValue.data());
+					break;
+				case (int)JsonParser::TokenType::number:
+
+					printf("number: ");
+					if (jp.numberNegative) {
+						printf("-");
+					}
+					printf("%lluE%i\n", jp.numberCoefficient, jp.numberExponent);
+					break;
+				default:
+					printf("char: %c\n", tok);
+					break;
+			}
+		}
+	}
+	std::getchar();
 	GLushort vertexIndecies[] = {
 		0,2,1,
 		1,2,3,

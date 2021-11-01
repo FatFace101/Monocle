@@ -25,6 +25,7 @@ StreamReader::StreamReader(FILE* file, unsigned int bufferSize) : input(file), b
 
 StreamReader::~StreamReader() {
 	fclose(input);
+	delete buffer;
 }
 
 void StreamReader::fillBuffer() {
