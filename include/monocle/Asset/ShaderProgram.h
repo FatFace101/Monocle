@@ -103,6 +103,13 @@ namespace mncl
 	public:
 		~ShaderModule();
 		ShaderModule(GLenum shaderType, std::istream* inputStream);
+
+		class CompileError : public std::runtime_error {
+			char* errorMessage;
+		public:
+			const char* getGlErrorMessage() const noexcept;
+			CompileError(GLuint shaderId);
+		};
 	};
 
 
@@ -133,6 +140,13 @@ namespace mncl
 
 		void use() const;
 		ShaderProgram(uint32_t moduleCount, ShaderModule** modules);
+
+		class LinkError : public std::runtime_error {
+			char* errorMessage;
+		public:
+			const char* getGlErrorMessage() const noexcept;
+			LinkError(GLuint programId);
+		};
 	};
 
 	#define MNCL_SCALAR_ACCEPT_TYPES(T) const GLenum ShaderUniform<T>::AcceptTypes[]

@@ -2,7 +2,6 @@
 #define MNCL_JSON_PARSER_H
 
 #include <vector>
-#include <map>
 #include <istream>
 
 namespace mncl {
@@ -18,68 +17,29 @@ namespace json {
 
 
 
-	class JsonValue {
-		virtual void write(void* dest) = 0;
-	};
-
-
-	class JsonValueObject : public JsonValue {
-		std::map<std::string, JsonValue*> values;
-	};
-
-	class JsonValueArray : public JsonValue {
-		std::vector<JsonValue*> values;
-	};
-
-	class JsonValueNumber : public JsonValue {
-		uint64_t numberCoefficient;
-		bool numberNegative;
-		int numberExponent;
-	};
-
-	class JsonValueString : public JsonValue {
-		std::string value;
-	};
-
-
-	class JsonType {
-		enum class RawType {
-			boolean = 0,
-			number = 1,
-			string = 2,
-			object = 3,
-			array = 4,
-			collection = 8,
-		};
-	};
-
-
-	class JsonObjectType : public JsonValue {
-		std::map<std::string, size_t> memberOffsets;
-		size_t objectSize;
-		void(*complete)(void* destination, void* out);
-	};
-
-	class JsonArrayType : public JsonValue {
-		size_t elementSize;
-	};
-
-
 
 
 
 	class JsonParser {
 	public:
-		enum class TokenType {
-			eof = -1,
-			number = -2,
-			string = -3
+		enum class TokenType : uint32_t {
+			is_type       = 0x80000000,
+			is_keyword    = 0x00000010,
+
+			eof           = 0x80000000,
+			number        = 0x80000001,
+			string        = 0x80000002,
+
+			keyword_true  = 0x80000010,
+			keyword_false = 0x80000011,
+			keyword_null  = 0x80000012,
 		};
 
-		JsonType* expected;
+
+
+
 		std::istream* input;
 		uint64_t charCount;
-
 
 		char lastChar;
 		
@@ -87,13 +47,13 @@ namespace json {
 		uint64_t numberCoefficient;
 		bool numberNegative;
 		int numberExponent;
-		std::vector<char> stringValue;
+		std::string stringValue;
 
 		// Update lastChar, returns true if eof or some equivalent has been reached.
 		bool advance();
 
 
-		int nextToken();
+		uint32_t nextToken();
 
 	public:
 		JsonParser();

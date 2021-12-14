@@ -70,22 +70,38 @@ ShaderModule::ShaderModule(GLenum shaderType, std::istream* inputStream) {
 	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compSuccess);
 	if (!compSuccess)
 	{
-		//Log error
-		/*GLint logSize = 0;
-		glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logSize);
-		char* errMsg = new char[(uint64_t)logSize + 1];
-		glGetShaderInfoLog(shaderId, logSize, nullptr, errMsg);
-		printf("Shader error:\n%s\n", errMsg);*/
+		CompileError *err = new CompileError(shaderId);
 		glDeleteShader(shaderId);
-		throw new std::runtime_error("Shader compilation error");
+		throw err;
 	}
+
 }
 
 
-ShaderModule::~ShaderModule() 
-{
-	glDeleteShader(shaderId);
+ShaderModule::CompileError::CompileError(GLuint shaderId) : std::runtime_error("Shader compilation error") {
+	GLint logSize = 0;
+	glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logSize);
+	errorMessage = new char[(uint64_t)logSize + 1];
+	glGetShaderInfoLog(shaderId, logSize, nullptr, errorMessage);
 }
+
+const char* ShaderModule::CompileError::getGlErrorMessage() const noexcept {
+	return errorMessage;
+}
+
+
+ShaderProgram::LinkError::LinkError(GLuint programId) : std::runtime_error("Shader link error") {
+	GLint logSize = 0;
+	glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &logSize);
+	errorMessage = new char[(uint64_t)logSize + 1];
+	glGetProgramInfoLog(programId, logSize, nullptr, errorMessage);
+}
+
+const char* ShaderProgram::LinkError::getGlErrorMessage() const noexcept {
+	return errorMessage;
+}
+
+
 
 ShaderProgram::ShaderProgram(uint32_t moduleCount, ShaderModule** modules) {
 	programId = glCreateProgram();
@@ -102,14 +118,9 @@ ShaderProgram::ShaderProgram(uint32_t moduleCount, ShaderModule** modules) {
 	glGetProgramiv(programId, GL_LINK_STATUS, &linkSuccess);
 	if (!linkSuccess)
 	{
-		//Log error
-		/*GLint logSize = 0;
-		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &logSize);
-		char* errMsg = new char[(uint64_t)logSize + 1];
-		glGetProgramInfoLog(programID, logSize, nullptr, errMsg);
-		printf("Program link error:\n%s\n", errMsg);*/
+		LinkError* err = new LinkError(programId);
 		glDeleteProgram(programId);
-		throw new std::runtime_error("Shader link error");
+		throw err;
 	}
 	for (uint32_t moduleIndex = 0; moduleIndex < moduleCount; moduleIndex++)
 	{

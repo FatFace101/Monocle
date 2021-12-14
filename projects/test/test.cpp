@@ -41,15 +41,13 @@ static void FrameBufferSizeCallback(GLFWwindow *window, int width, int height) {
 };
 
 int main(int argc, char** argv) {
-	if (!glfwInit()) {
-		return 1;
-	}
 	{
 		using namespace mncl::json;
-		JsonParser jp = JsonParser(new std::ifstream("sample.json"));
+		JsonParser jp = JsonParser();
+		jp.setStream(new std::ifstream("sample.json"));
 
 		while (true) {
-			int tok = 0;
+			uint32_t tok = 0;
 			try {
 				tok = jp.nextToken();
 			}
@@ -61,24 +59,44 @@ int main(int argc, char** argv) {
 				printf("EOF\n");
 				break;
 			}
-			switch (tok) {
-						
-				case (int)JsonParser::TokenType::string:
-					printf("string: %s\n", jp.stringValue.data());
-					break;
-				case (int)JsonParser::TokenType::number:
-
-					printf("number: ");
-					if (jp.numberNegative) {
-						printf("-");
+			if (tok & (uint32_t)JsonParser::TokenType::is_type) {
+				if (tok & (uint32_t)JsonParser::TokenType::is_keyword) {
+					switch (tok) {
+						case (uint32_t)JsonParser::TokenType::keyword_true:
+							printf("Keyword true\n");
+							break;
+						case (uint32_t)JsonParser::TokenType::keyword_false:
+							printf("Keyword false\n");
+							break;
+						default:
+							printf("Keyword null\n");
+							break;
 					}
-					printf("%lluE%i\n", jp.numberCoefficient, jp.numberExponent);
-					break;
-				default:
-					printf("char: %c\n", tok);
-					break;
+				}
+				else {
+					switch (tok) {
+						case (int)JsonParser::TokenType::string:
+							printf("string: %s\n", jp.stringValue.c_str());
+							break;
+						case (int)JsonParser::TokenType::number:
+							printf("number: ");
+							if (jp.numberNegative) {
+								printf("-");
+							}
+							printf("%lluE%i\n", jp.numberCoefficient, jp.numberExponent);
+							break;
+					}
+				}
 			}
+			else {
+				printf("char: %c\n", (char)tok);
+			}
+			
 		}
+	}
+
+	if (!glfwInit()) {
+		return 1;
 	}
 	std::getchar();
 	GLushort vertexIndecies[] = {
@@ -148,22 +166,19 @@ int main(int argc, char** argv) {
 	glGenBuffers(1, &uvBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexUVs), vertexUVs, GL_STATIC_DRAW);
-	
-	mncl::ShaderModule* vShader; 
-	if (!mncl::ShaderModule::Create(&vShader, GL_VERTEX_SHADER, new std::ifstream("vertex.gl"))) {
-		return 1;
-	}
-
-	mncl::ShaderModule* fShader; 
-	if (!mncl::ShaderModule::Create(&fShader, GL_FRAGMENT_SHADER, new std::ifstream("fragment.gl"))) {
-		return 1;
-	}
-
 	mncl::ShaderProgram* shaderProgram;
-	if (!mncl::ShaderProgram::Create(&shaderProgram, 2, new mncl::ShaderModule*[2] {vShader, fShader})) {
+	try {
+		mncl::ShaderModule* vShader = new mncl::ShaderModule(GL_VERTEX_SHADER, new std::ifstream("vertex.gl"));
+
+		mncl::ShaderModule* fShader = new mncl::ShaderModule(GL_FRAGMENT_SHADER, new std::ifstream("fragment.gl"));
+
+		shaderProgram = new mncl::ShaderProgram(2, new mncl::ShaderModule * [2]{ vShader, fShader});
+	}
+	catch (mncl::ShaderProgram::LinkError* err) {
+		printf("%s\n", err->what());
+		printf("%s\n", err->getGlErrorMessage());
 		return 1;
 	}
-
 	
 	
 
