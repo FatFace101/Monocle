@@ -1,10 +1,11 @@
 #include "monocle/Asset/JsonParser.h"
 
+#include <stack>
 #include <map>
 #include <cctype>
 
 using namespace mncl;
-using namespace json;
+using namespace asset;
 
 
 
@@ -232,10 +233,40 @@ uint32_t JsonParser::nextToken()
 }
 
 
-
-
 void JsonParser::setStream(std::istream* input, uint64_t charCount) {
 	this->input = input;
 	this->charCount = charCount;
 	lastChar = input->get();
+}
+
+
+
+
+
+void JsonParser::parse() {
+
+	std::stack<ValueType> values;
+	while (true) {
+		uint32_t tok = nextToken();
+		if (tok & (uint32_t)TokenType::is_special) {
+			if (tok & (uint32_t)TokenType::is_keyword) {
+				if (tok == (uint32_t)TokenType::keyword_null) {
+					
+				}
+				else {
+					// boolean
+				}
+			}
+			else if (tok == (uint32_t)TokenType::string) {
+
+			}
+			else if (tok == (uint32_t)TokenType::number) {
+
+			}
+			
+		}
+		else {
+
+		}
+	}
 }

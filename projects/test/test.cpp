@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 				printf("EOF\n");
 				break;
 			}
-			if (tok & (uint32_t)JsonParser::TokenType::is_type) {
+			if (tok & (uint32_t)JsonParser::TokenType::is_special) {
 				if (tok & (uint32_t)JsonParser::TokenType::is_keyword) {
 					switch (tok) {
 						case (uint32_t)JsonParser::TokenType::keyword_true:
